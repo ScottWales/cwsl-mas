@@ -26,6 +26,7 @@ limitations under the License.
 
 import re
 from vistrails.core.modules import vistrails_module
+from vistrails.core.modules.config import IPort, OPort
 
 def register(reg):
     """
@@ -42,6 +43,18 @@ def register(reg):
                 "brief"    : "test operator",
                 "man"      : "test generated module",
                 "synopsis" : "test ifile ifile ofile"
+                }],
+            "Arithmetic"   : [{
+                "name"     : "monsub",
+                "brief"    : "Monthly arithmetic",
+                "man"      : "test generated module",
+                "synopsis" : "monsub ifile ifile ofile"
+                }],
+            "Statistical Values"   : [{
+                "name"     : "monmean",
+                "brief"    : "Monthly statistical values",
+                "man"      : "test generated module",
+                "synopsis" : "monmean ifile ofile"
                 }],
             }
 
@@ -98,14 +111,24 @@ def register_synopsis(operator,synopsis):
     The synopsis should be the same as what is listed in the CDO operator help text
     """
 
-    # Set number of single file inputs and output
     if re.match('[A-Za-z]+(\s+ifile)+\s+ofile$',synopsis):
-        operator._output_ports = [('out_dataset','csiro.au.cwsl:VtDataSet')]
+        # Set number of single file inputs and output
+        operator._output_ports = [OPort('out_dataset','csiro.au.cwsl:VtDataSet')]
         operator._input_ports = []
 
         operator.input_count = synopsis.count('ifile')
         for i in xrange(operator.input_count):
-            operator._input_ports.append(('in_dataset_%s'%i,'csiro.au.cwsl:VtDataSet'))
+            operator._input_ports.append(
+                    IPort(
+                        'in_dataset_%s'%i,
+                        'csiro.au.cwsl:VtDataSet',
+                        min_conns=1,
+                        max_conns=1))
+
+    elif re.match('[A-Za-z]+\s+ifiles\s+ofile$',synopsis):
+        # Arbitrary number of file inputs and output
+        operator._output_ports = [OPort('out_dataset','csiro.au.cwsl:VtDataSet')]
+        operator._input_ports = [IPort('in_datasets','csiro.au.cwsl:VtDataSet',min_conns=1)]
 
     else:
         # Not implemented
