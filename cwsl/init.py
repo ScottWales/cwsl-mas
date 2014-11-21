@@ -40,6 +40,7 @@ from cwsl.vt_modules.vt_plot_timeseries import PlotTimeSeries
 from cwsl.vt_modules.imageviewer import ImageViewerPanel
 from cwsl.vt_modules.cmip5_constraints import CMIP5Constraints
 
+from cwsl.vt_modules import vt_cdo
 
 def initialize(*args, **keywords):
 
@@ -99,6 +100,8 @@ def initialize(*args, **keywords):
     reg.add_module(GeneralCommandPattern, name='General Command Line Program',
                    namespace='Utilities')
 
+    # CDO operations
+    vt_cdo.register(reg)
 
 def menu_items():
     """
